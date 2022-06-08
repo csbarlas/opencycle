@@ -1,0 +1,3 @@
+Mopencycle	opencycle.c	/^int main()$/
+init_buttons	button_engine.c	/^int init_buttons()$/
+opencycle_init	opencycle.c	/^int opencycle_init()$/
