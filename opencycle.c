@@ -8,6 +8,7 @@
 
 #include "state.h"
 #include "pin_mappings.h"
+#include "debug.h"
 
 #include "opencycle.h"
 #include "buttons.h"
@@ -23,32 +24,21 @@ int main()
 
     init_buttons();
 
-    //init_lcd();
+    if(LCD_ENABLE) init_lcd();
 
     init_gps();
 
     parse_raw_gps_data();
 
-    // while(1)
-    // {
-    //     clock_t t;
-    //     t = clock();
-    //     parse_gga_string();
-    //     t = clock() - t;
-    //     double elapsed = ((double) t)/CLOCKS_PER_SEC;
-    //     printf("Took %lf seconds\n", elapsed);
-    // }
-
-    // while(1)
-    // {
-    //     switch (main_state.curr_state)
-    //     {
-    //         case STATE_INIT:
-    //             break;
-    //         case STATE_GPS_STANDBY:
-    //             break;  
-    //     }
-    // }
-
     return EXIT_SUCCESS;
+}
+
+
+void divider(int length)
+{
+    for(int i = 0; i < length; i++)
+    {
+        printf("*");
+    }
+    printf("\n");
 }

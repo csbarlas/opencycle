@@ -1,7 +1,7 @@
 all: headers opencycle
 
 #debug entry NOT FOR RELEASE
-opencycle: opencycle.o buttons.o callbacks.o oc_lcd.o oc_gps.o state.h pin_mappings.h
+opencycle: opencycle.o buttons.o callbacks.o oc_lcd.o oc_gps.o state.h pin_mappings.h debug.h
 	gcc -Wall -g -o bin/$@ $^ -lwiringPi -lwiringPiDev
 
 #easy rule for backups

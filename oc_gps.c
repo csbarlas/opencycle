@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <math.h>
 
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
 #include "state.h"
+#include "debug.h"
+#include "oc_gps.h"
 
 static int serial_port;
 static char buffer[100];
@@ -72,6 +77,9 @@ char *parse_gga_string()
     return buffer;
 }
 
+
+//TODO Handle when there is no gps fix:
+//$GPGGA,010617.00,,,,,0,00,99.99,,,,,,*67
 void parse_raw_gps_data()
 {
     char delimiters[] = ",";
@@ -83,14 +91,39 @@ void parse_raw_gps_data()
     while(token != NULL)
     {
         gga_array[i++] = token;
-        printf("%s\n", token);
+        printf("%s is of length %d\n", token, strlen(token));
         token = strtok(NULL, delimiters);
     }
 
-
+    double decimal_lat = compute_decimal_degrees(gga_array[1], gga_array[2][0]);
+    double decimal_long = compute_decimal_degrees(gga_array[3], gga_array[4][0]);
+    
+    if (DEBUG) printf("(%lf,%lf)\n", decimal_lat, decimal_long);
 }
 
-compute_decimal_degree(double deg_plus_min, char direction)
+//Converts raw GGA longitude and latitude strings into decimal degrees
+double compute_decimal_degrees(char *raw_lat, char dir)
 {
-    
+    double temp, frac_mins, ret;
+    int whole_minutes, whole_degrees;
+
+    //Convert GGA string into more workable types
+    //and split into integer from decimal parts
+    double double_raw_lat = strtod(raw_lat, NULL);
+    frac_mins = modf(double_raw_lat, &temp);
+
+    //Get whole degrees and whole minutes
+    whole_degrees = (int) temp;
+    whole_minutes = whole_degrees % 10;
+    whole_degrees /= 10;
+    whole_minutes += (whole_degrees % 10) * 10;
+    whole_degrees /= 10;
+
+    //Convert to decimal degrees
+    ret = whole_degrees + (whole_minutes / 60.0) + (frac_mins / 60);
+
+    //Change signs if appropriate
+    if(dir == 'S' || dir == 'W') ret *= -1;
+
+    return ret;
 }
