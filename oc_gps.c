@@ -3,6 +3,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
+#include <time.h>
 
 #include <wiringPi.h>
 #include <wiringSerial.h>
@@ -20,7 +22,28 @@ void init_gps()
 {
     if((serial_port = serialOpen("/dev/ttyAMA1", 9600)) < 0)
     {
-        printf("Cannot open serial device\n");
+        printf("init_gps: ERROR Cannot open serial device\n");
+    }
+
+    pthread_t gps_thread;
+    pthread_create(&gps_thread, NULL, gps_thread_manager, NULL);
+    main_state.gps_thread_id = gps_thread;
+}
+
+void *gps_thread_manager(void *data)
+{
+    while(1)
+    {
+        switch(main_state.curr_state)
+        {
+            case STATE_READY_TO_CAPTURE:
+                if (DEBUG) printf("gps_thread_manager: awaiting start capture\n");
+                sleep(1);
+                break;
+            case STATE_GPS_CAPTURE:
+                parse_raw_gps_data();
+                break;
+        }
     }
 }
 
@@ -73,7 +96,13 @@ char *parse_gga_string()
         }
     }
     
-    printf("%s\n", buffer);
+    if (DEBUG)
+    {
+        printf("parse_gga_string:\n");
+        printf("%s\n", buffer);
+        print_divider(DIVIDER_LENGTH);
+    }
+    
     return buffer;
 }
 
@@ -91,14 +120,14 @@ void parse_raw_gps_data()
     while(token != NULL)
     {
         gga_array[i++] = token;
-        printf("%s is of length %d\n", token, strlen(token));
+        if (DEBUG) printf("parse_raw_gps_data: %s is of length %d\n", token, strlen(token));
         token = strtok(NULL, delimiters);
     }
 
-    double decimal_lat = compute_decimal_degrees(gga_array[1], gga_array[2][0]);
-    double decimal_long = compute_decimal_degrees(gga_array[3], gga_array[4][0]);
+    main_state.lat_dd = compute_decimal_degrees(gga_array[1], gga_array[2][0]);
+    main_state.long_dd = compute_decimal_degrees(gga_array[3], gga_array[4][0]);
     
-    if (DEBUG) printf("(%lf,%lf)\n", decimal_lat, decimal_long);
+    if (DEBUG) printf("parse_raw_gps_data: (%lf,%lf)\n", main_state.lat_dd, main_state.long_dd);
 }
 
 //Converts raw GGA longitude and latitude strings into decimal degrees

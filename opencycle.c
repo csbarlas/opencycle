@@ -27,14 +27,18 @@ int main()
     if(LCD_ENABLE) init_lcd();
 
     init_gps();
-
-    parse_raw_gps_data();
+    main_state.curr_state = STATE_READY_TO_CAPTURE;
+    while(1)
+    {
+        printf("main: current state = %d", main_state.curr_state);
+        sleep(1);
+    }
 
     return EXIT_SUCCESS;
 }
 
 
-void divider(int length)
+void print_divider(int length)
 {
     for(int i = 0; i < length; i++)
     {

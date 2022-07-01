@@ -1,3 +1,5 @@
+#include <pthread.h>
+
 typedef enum runtime_state
 {
     STATE_ERR,
@@ -13,9 +15,10 @@ typedef enum runtime_state
 typedef struct OC_State
 {
     runtime_state curr_state;
+    double lat_dd; //dd = decimal degree
+    double long_dd;
+    double gps_time;
     short gps_quality;
     short sats_in_view;
-    double lat;
-    double lng;
-    double gps_time;
+    pthread_t gps_thread_id;
 } OC_State;
