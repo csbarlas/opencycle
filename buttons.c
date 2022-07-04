@@ -37,5 +37,9 @@ int init_buttons()
     pullUpDnControl(START_BUTTON, PUD_UP);
     wiringPiISR(START_BUTTON, INT_EDGE_FALLING, main_button_pressed);
 
+    pinMode(STOP_BUTTON, INPUT);
+    pullUpDnControl(STOP_BUTTON, PUD_UP);
+    wiringPiISR(STOP_BUTTON, INT_EDGE_FALLING, secondary_button_pressed);
+
     return 0;
 }

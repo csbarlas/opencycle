@@ -18,7 +18,7 @@ typedef struct OC_State
     double lat_dd; //dd = decimal degree
     double long_dd;
     double gps_time;
-    short gps_quality;
-    short sats_in_view;
+    int gps_quality;
+    int sats_in_view;
     pthread_t gps_thread_id;
 } OC_State;

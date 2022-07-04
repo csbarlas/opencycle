@@ -13,6 +13,8 @@
 #include "debug.h"
 #include "oc_gps.h"
 
+#define EXPECTED_STRING_LENGTH 68
+
 static int serial_port;
 static char buffer[100];
 
@@ -34,16 +36,7 @@ void *gps_thread_manager(void *data)
 {
     while(1)
     {
-        switch(main_state.curr_state)
-        {
-            case STATE_READY_TO_CAPTURE:
-                if (DEBUG) printf("gps_thread_manager: awaiting start capture\n");
-                sleep(1);
-                break;
-            case STATE_GPS_CAPTURE:
-                parse_raw_gps_data();
-                break;
-        }
+        parse_raw_gps_data();
     }
 }
 
@@ -111,8 +104,12 @@ char *parse_gga_string()
 //$GPGGA,010617.00,,,,,0,00,99.99,,,,,,*67
 void parse_raw_gps_data()
 {
+    int string_length = 0;
     char delimiters[] = ",";
     char *gga_string = parse_gga_string();
+    string_length = strlen(gga_string);
+    if (DEBUG) printf("parse_raw_gps_data: length of string is %d\n", string_length);
+    if (string_length < 68) return;
     char *gga_array[13];
     int i = 0;
 
@@ -126,6 +123,9 @@ void parse_raw_gps_data()
 
     main_state.lat_dd = compute_decimal_degrees(gga_array[1], gga_array[2][0]);
     main_state.long_dd = compute_decimal_degrees(gga_array[3], gga_array[4][0]);
+
+    main_state.gps_quality = atoi(gga_array[5]);
+    main_state.sats_in_view = atoi(gga_array[6]);
     
     if (DEBUG) printf("parse_raw_gps_data: (%lf,%lf)\n", main_state.lat_dd, main_state.long_dd);
 }
