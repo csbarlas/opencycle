@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "state.h"
-#include "buttons.h"
+#include "oc_buttons.h"
 #include "stdint.h"
 #include "pin_mappings.h"
 #include "debug.h"

@@ -11,7 +11,7 @@
 #include "debug.h"
 
 #include "opencycle.h"
-#include "buttons.h"
+#include "oc_buttons.h"
 #include "oc_gps.h"
 
 //Struct representing current program state
@@ -27,7 +27,15 @@ int main()
     if(LCD_ENABLE) init_lcd();
 
     init_gps();
-    main_state.curr_state = STATE_GPS_STANDBY;
+
+    if(SPOOF_GPS)
+    {
+        main_state.curr_state=STATE_READY_TO_CAPTURE;
+    }
+    else
+    {
+        main_state.curr_state = STATE_GPS_STANDBY;
+    }
 
     int points_captured = 0;
     while(1)

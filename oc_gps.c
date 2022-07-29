@@ -21,12 +21,13 @@ static char buffer[100];
 extern OC_State main_state;
 
 void init_gps()
-{
-    if((serial_port = serialOpen("/dev/ttyAMA1", 9600)) < 0)
+{   
+    if((!SPOOF_GPS && (serial_port = serialOpen("/dev/ttyAMA1", 9600))) < 0)
     {
         printf("init_gps: ERROR Cannot open serial device\n");
+        return;
     }
-
+ 
     pthread_t gps_thread;
     pthread_create(&gps_thread, NULL, gps_thread_manager, NULL);
     main_state.gps_thread_id = gps_thread;
@@ -36,8 +37,22 @@ void *gps_thread_manager(void *data)
 {
     while(1)
     {
-        parse_raw_gps_data();
+        if(SPOOF_GPS)
+        {
+            generate_fake_coordindates();
+        }
+        else
+        {
+            parse_raw_gps_data();
+        }
+        
     }
+}
+
+void generate_fake_coordindates()
+{
+    main_state.lat_dd = 37.3230;
+    main_state.long_dd = -122.0322;
 }
 
 int NMEA_msg_is_GGA(char *data)

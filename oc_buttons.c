@@ -3,9 +3,9 @@
 #include <wiringPi.h>
 
 #include "state.h"
-#include "buttons.h"
+#include "oc_buttons.h"
 #include "pin_mappings.h"
-#include "callbacks.h"
+#include "oc_callbacks.h"
 
 #define BUTTON_DEBOUNCE_VALUE 3E8L
 
