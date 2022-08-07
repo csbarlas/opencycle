@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <pthread.h>
 
 typedef enum runtime_state
@@ -21,4 +22,5 @@ typedef struct OC_State
     int gps_quality;
     int sats_in_view;
     pthread_t gps_thread_id;
+    FILE *gpx_file;
 } OC_State;

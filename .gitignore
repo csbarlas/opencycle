@@ -1,5 +1,6 @@
 *.o
 bin/
+delete/
 *.h
 !state.h
 !pinmappings.h

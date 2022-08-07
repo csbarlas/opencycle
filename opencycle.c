@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <time.h>
+#include <signal.h>
 
 #include <wiringPi.h>
 
@@ -13,6 +14,7 @@
 #include "opencycle.h"
 #include "oc_buttons.h"
 #include "oc_gps.h"
+#include "oc_file.h"
 
 //Struct representing current program state
 OC_State main_state = { STATE_INIT , 0.0, 0.0, 0.0, 0, 0 };
@@ -26,6 +28,12 @@ int main()
 
     if(LCD_ENABLE) init_lcd();
 
+    init_file();
+
+    generate_gpx_header();
+
+    signal(SIGINT, sigint_handler);
+    
     init_gps();
 
     if(SPOOF_GPS)
@@ -58,10 +66,13 @@ int main()
                 break;
             case STATE_GPS_CAPTURE: ; //added ; for some label after statement error
                 gps_capture_output(points_captured++);
+                print_trkpt();
                 sleep(1);
                 break;
             case STATE_GPS_PROCESSING:
                 gps_processing_output();
+                generate_gpx_footer();
+                close_file();
                 sleep(3);
                 main_state.curr_state = STATE_GPS_STANDBY;
                 break;
@@ -91,4 +102,11 @@ void print_divider(int length)
         printf("*");
     }
     printf("\n");
+}
+
+void sigint_handler(int signal)
+{
+    if (DEBUG) printf("KEYBOARD INTERRUPT\n");
+    close_file();
+    exit(0);
 }
