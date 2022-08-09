@@ -28,10 +28,7 @@ int main()
 
     if(LCD_ENABLE) init_lcd();
 
-    init_file();
-
-    generate_gpx_header();
-
+    //TODO add protection if no file is open
     signal(SIGINT, sigint_handler);
     
     init_gps();

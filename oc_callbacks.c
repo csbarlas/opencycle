@@ -25,6 +25,8 @@ void main_button_pressed(void)
                 break;
             case STATE_READY_TO_CAPTURE:
                 button_transition_msg("main_button_pressed", prev_state, STATE_GPS_CAPTURE);
+                init_file();
+                generate_gpx_header();
                 main_state.curr_state = STATE_GPS_CAPTURE;
                 break;
             case STATE_GPS_CAPTURE:
