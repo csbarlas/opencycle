@@ -91,7 +91,6 @@ int main()
     return EXIT_SUCCESS;
 }
 
-
 void print_divider(int length)
 {
     for(int i = 0; i < length; i++)

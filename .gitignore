@@ -1,6 +1,7 @@
 *.o
 bin/
 delete/
+oc_output/
 *.h
 !state.h
 !pinmappings.h
